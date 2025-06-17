@@ -9,8 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7a66a34ed34e484a90a728b4fb2259f, type: 3}
-  m_Name: Green
+  m_Script: {fileID: 11500000, guid: a76c19755ce558f4095346a1964b0ada, type: 3}
+  m_Name: TutEncounter
   m_EditorClassIdentifier: 
-  units:
-  - {fileID: 0}
+  encounters:
+  - encounterName: Stevens Appear!
+    enemies:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
