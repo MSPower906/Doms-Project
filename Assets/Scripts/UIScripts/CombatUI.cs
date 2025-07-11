@@ -11,11 +11,13 @@ public class CombatUI : MonoBehaviour
     [SerializeField] private Image healthBarUI;
     [SerializeField] private Image manaBarUI;
     public AbilityUIs[] abilityUI;
+    public GameObject playerUIObj;
 
 
     public void SetUI(CharacterStatsScript stats)
     {
-        nameUI.text = stats.name;
+       
+        nameUI.text = stats.unitName;
         healthBarUI.fillAmount = stats.currentHealth / stats.maxHealth;
         manaBarUI.fillAmount = stats.currentMana / stats.maxMana;
 
@@ -26,6 +28,11 @@ public class CombatUI : MonoBehaviour
             abilityUI[i].abilityDamageNumber.text = stats.abilities[i].damage.ToString("f0");
             abilityUI[i].abilityManaCost.text = stats.abilities[i].manaCost.ToString("f0");
         }
+        playerUIObj.SetActive(true);
+    }
+    public void NullUI()
+    {
+        playerUIObj.SetActive(false);
     }
 
 

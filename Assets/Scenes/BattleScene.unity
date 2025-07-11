@@ -421,13 +421,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ca14c5ce30d07c43a687d0af76b0a4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  encounterDatabase: {fileID: 11400000, guid: d74f6e160550ae84f83166f9539c30e8, type: 2}
+  partyDatabase: {fileID: 11400000, guid: 5ed22c6e1b54eb34ea8e34be4acac8fe, type: 2}
   state: 0
-  playerPrefabs:
-  - {fileID: 452376901649622664, guid: d60e0313320e840428c43435bb4a7296, type: 3}
-  - {fileID: 788038679987376947, guid: dbc9320b541838f4c8cae2f469f3e6da, type: 3}
-  enemyPrefabs:
-  - {fileID: 2010371603419561428, guid: 90ca7d39e8e2f7941918bb16e8e01e88, type: 3}
-  - {fileID: 2010371603419561428, guid: 90ca7d39e8e2f7941918bb16e8e01e88, type: 3}
   enemyBattlePos:
   - {fileID: 393168380}
   - {fileID: 1824810129}
@@ -439,7 +435,7 @@ MonoBehaviour:
   - {fileID: 1583848153}
   - {fileID: 523197053}
   turnlist: []
-  playerCharacters: []
+  alivePlayerCharacters: []
   combatUI: {fileID: 210760435}
   currentTurnOrderIndex: 0
   currentCharacter: {fileID: 0}
@@ -496,6 +492,7 @@ MonoBehaviour:
     abilityDescUI: {fileID: 1815264662}
     abilityDamageNumber: {fileID: 367384189}
     abilityManaCost: {fileID: 512004145}
+  playerUIObj: {fileID: 6491380222209475188}
 --- !u!1 &280002579
 GameObject:
   m_ObjectHideFlags: 0

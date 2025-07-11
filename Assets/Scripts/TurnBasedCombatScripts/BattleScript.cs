@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum Classification
@@ -31,17 +32,19 @@ public enum BattleState { Start, Waiting, Enemy, Win, Loss }
 
 public class BattleScript : MonoBehaviour
 {
-    public BattleState state;
+    [SerializeField] private EncountersDatabaseScript encounterDatabase;
+    [SerializeField] private PartyDatabaseScript partyDatabase;
 
-    public GameObject[] playerPrefabs;
-    public GameObject[] enemyPrefabs;
+    public static int ChosenEncounterIndex;
+
+    public BattleState state;
 
     public Transform[] enemyBattlePos;
     public Transform[] playerBattlePos;
 
     public List<GameObject> turnlist;
     
-    public List<GameObject> playerCharacters;
+    public List<GameObject> alivePlayerCharacters;
 
     [SerializeField] private CombatUI combatUI;
     [SerializeField] private int currentTurnOrderIndex;
@@ -55,30 +58,40 @@ public class BattleScript : MonoBehaviour
 
     void Start()
     {
+       
         state = BattleState.Start;
         currentTurnOrderIndex = 0;
-        SetupBattle();
+        
+        SetupBattle(encounterDatabase.encounters[ChosenEncounterIndex].enemies, partyDatabase.playerParty);
+        //gets the chosen encounters enemy list to be used during battle set up.
     }
 
-    void SetupBattle()
+
+    void SetupBattle(GameObject[] enemyEncounter, GameObject[] playerParty)
     {
         //Select party members and what enemies they will fight
         turnlist = new List<GameObject>();
 
+
         //Runs through the selected part memebers and enemies add them to a list
-        for (int i = 0; i < playerPrefabs.Length; i++)
+        for (int i = 0; i < playerParty.Length; i++)
         {
-            Transform spawnpos = playerBattlePos[i];
-            var chosenplayer = Instantiate(playerPrefabs[i], spawnpos.position, transform.rotation, transform.parent);
-            turnlist.Add(chosenplayer);
-            playerCharacters.Add(chosenplayer);
-            playerCount++;
+       
+                Transform spawnpos = playerBattlePos[i];
+                var chosenplayer = Instantiate(playerParty[i], spawnpos.position, transform.rotation, transform.parent);
+                turnlist.Add(chosenplayer);
+                alivePlayerCharacters.Add(chosenplayer);
+
+                playerCount++;
+            
         }
-        for (int i = 0; i < enemyPrefabs.Length; i++)
+        for (int i = 0; i < enemyEncounter.Length; i++)
         {
             Transform spawnpos = enemyBattlePos[i];
-            var chosenenemy = Instantiate(enemyPrefabs[i], spawnpos.position, transform.rotation, transform.parent);
+            var chosenenemy = Instantiate(enemyEncounter[i], spawnpos.position, transform.rotation, transform.parent);
+            chosenenemy.name = enemyEncounter[i].name + i;
             turnlist.Add(chosenenemy);
+
             enemiesCount++;
         }
 
@@ -94,6 +107,7 @@ public class BattleScript : MonoBehaviour
         //Add any start of turn stuff we want e.g DOT/effects, could always broadcast a message to a flowchart?
 
         currentCharacter = turnlist[currentTurnOrderIndex].GetComponent<CharacterStatsScript>();
+       
 
         switch (currentCharacter.playerCharacter)
         {
@@ -105,13 +119,15 @@ public class BattleScript : MonoBehaviour
 
     void AITurn()
     {
-
+        
         chosenAbility = Random.Range(0, currentCharacter.abilities.Length);
-        int target = Random.Range(0, playerCharacters.Count);
+        int target = Random.Range(0, alivePlayerCharacters.Count);
+        
+      
         //Send attack info to the battle script to be assigned 
 
-        Debug.Log("I am attacking:" + playerCharacters[target].name + "With" + currentCharacter.abilities[chosenAbility].abilName);
-        TargetSelected(playerCharacters[target].GetComponent<CharacterStatsScript>());
+        //selects a random ability that the AI has and attacks a random player character from the one curretly still alive.
+        TargetSelected(alivePlayerCharacters[target].GetComponent<CharacterStatsScript>());
         
     }
 
@@ -120,18 +136,16 @@ public class BattleScript : MonoBehaviour
         combatUI.SetUI(currentCharacter);
     }
 
-    public void AbilitySelected(int abilityInt)
+    void TargetToggle()
     {
-        chosenAbility = abilityInt;
-
         if (currentCharacter.abilities[chosenAbility].targetEnemy)
         {
             foreach (var character in turnlist)
             {
                 if (character.GetComponent<CharacterStatsScript>().playerCharacter == false)
                 {
-
-                    character.gameObject.transform.Find("Target").gameObject.SetActive(true);
+                    GameObject target = character.gameObject.transform.Find("Target").gameObject;
+                    target.SetActive(!target.activeInHierarchy);
 
                 }
             }
@@ -146,12 +160,18 @@ public class BattleScript : MonoBehaviour
                 }
             }
         }
-
-        actionSelected = true;
-        StartCoroutine(WaitingForActions());
     }
 
-    public IEnumerator WaitingForActions()
+    public void AbilitySelected(int abilityInt)
+    {
+        chosenAbility = abilityInt;
+        TargetToggle();
+
+        actionSelected = true;
+        StartCoroutine(SelectTarget());
+    }
+
+    public IEnumerator SelectTarget()
     {
         while (actionSelected)
         {
@@ -169,6 +189,7 @@ public class BattleScript : MonoBehaviour
                         TargetSelected(hit.transform.gameObject.transform.GetComponentInParent<CharacterStatsScript>());
 
                         actionSelected = false;
+                        TargetToggle();
                     }
                 }
             }
@@ -180,7 +201,7 @@ public class BattleScript : MonoBehaviour
 
     public void TargetSelected(CharacterStatsScript stats)
     {
-       
+       combatUI.NullUI();
         currentCharacter.currentMana -= currentCharacter.abilities[chosenAbility].manaCost;
 
         stats.currentHealth -= currentCharacter.abilities[chosenAbility].damage;
@@ -191,17 +212,19 @@ public class BattleScript : MonoBehaviour
 
             Debug.Log(stats.gameObject + "Died");
 
+            stats.gameObject.SetActive(false);
+
             switch (stats.playerCharacter)
             {
-                case true: playerCount--; playerCharacters.Remove(stats.gameObject); break;
+                case true: playerCount--; alivePlayerCharacters.Remove(stats.gameObject); break;
                 case false: enemiesCount--; break;
             }
 
-            stats.gameObject.SetActive(false);
-
-            WinLossCheck();
+            
+            
         }
 
+        WinLossCheck();
         //Effected the chosen targets + anis
 
         //Update effect UIs
@@ -209,7 +232,7 @@ public class BattleScript : MonoBehaviour
         //Check if fight is over
 
 
-      
+
     }
 
     void WinLossCheck()

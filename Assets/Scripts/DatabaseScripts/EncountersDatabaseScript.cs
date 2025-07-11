@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 [CreateAssetMenu]
 public class EncountersDatabaseScript : ScriptableObject
@@ -15,3 +16,4 @@ public class Encounters
     public string encounterName;
     public GameObject[] enemies;
 }
+

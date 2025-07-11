@@ -15,7 +15,7 @@ MonoBehaviour:
   encounters:
   - encounterName: Stevens Appear!
     enemies:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+    - {fileID: 2010371603419561428, guid: 90ca7d39e8e2f7941918bb16e8e01e88, type: 3}
+    - {fileID: 2010371603419561428, guid: 90ca7d39e8e2f7941918bb16e8e01e88, type: 3}
+    - {fileID: 2010371603419561428, guid: 90ca7d39e8e2f7941918bb16e8e01e88, type: 3}
+    - {fileID: 2010371603419561428, guid: 90ca7d39e8e2f7941918bb16e8e01e88, type: 3}

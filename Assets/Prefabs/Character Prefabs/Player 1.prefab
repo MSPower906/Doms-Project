@@ -123,11 +123,11 @@ MonoBehaviour:
   unitName: Player
   unitType: 
   playerCharacter: 1
-  unitStr: 0
-  unitVit: 0
+  unitStr: 23
+  unitVit: 23
   unitSpd: 10000
-  unitWis: 0
-  unitCha: 0
+  unitWis: 23
+  unitCha: 23
   currentHealth: 25
   maxHealth: 50
   currentMana: 40

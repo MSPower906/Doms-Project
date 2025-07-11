@@ -128,7 +128,7 @@ MonoBehaviour:
   unitSpd: 55
   unitWis: 5
   unitCha: 5
-  currentHealth: 5
+  currentHealth: -1
   maxHealth: 5
   currentMana: 5
   maxMana: 5
